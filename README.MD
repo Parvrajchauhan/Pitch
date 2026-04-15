@@ -172,7 +172,7 @@ docker-compose up --build
 cd server
 pip install -r requirements.txt
 python -m nltk.downloader punkt punkt_tab
-uvicorn app.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8000
 ```
 
 **Frontend:**
