@@ -18,9 +18,6 @@ class HuggingFaceClient:
             model="stabilityai/stable-diffusion-xl-base-1.0"
         )
 
-        print("TYPE:", type(result))
-        print("VALUE:", result)
-
         if hasattr(result, "save"):  # PIL Image
             buffer = BytesIO()
             result.save(buffer, format="PNG")

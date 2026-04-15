@@ -1,69 +1,106 @@
 import nltk
 from typing import List, Dict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.services.promt.gemini_client import generate_image_prompt
 from src.services.image.huggingface_client import HuggingFaceClient
 
 
-def build_prompt(sentence: str, style: str) -> str:
-    """
-    Uses Gemini to convert sentence → vivid image prompt,
-    then injects style on top.
-    """
+def build_prompt(
+    sentence: str,
+    style: str,
+    panel_index: int,
+    panel_total: int,
+    visual_thread: dict | None = None
+) -> str:
 
-    # Step 1: Generate base cinematic prompt via Gemini
-    base_prompt = generate_image_prompt(sentence)
+    base_prompt = generate_image_prompt(
+        sentence=sentence,
+        panel_index=panel_index,
+        panel_total=panel_total,
+        visual_thread=visual_thread
+    )
 
-    # 🔥 IMPORTANT: trim prompt (SDXL providers fail on long prompts)
-    base_prompt = base_prompt[:400]
-
-    # Step 2: Add style control
-    final_prompt = f"{style} style, {base_prompt}"
-
-    return final_prompt
+    return f"{style} style, {base_prompt}"
 
 
-def generate_panels(text: str, style: str, hf_api_key: str) -> List[Dict]:
-    """
-    Splits text into sentences, generates prompts, calls HF API,
-    and returns structured panel data.
-    """
+def process_single(
+    idx: int,
+    sentence: str,
+    style: str,
+    total: int,
+    client: HuggingFaceClient,
+    visual_thread: dict | None
+) -> tuple[int, Dict | None]:
 
-    # Ensure tokenizer exists
+    sentence = sentence.strip()
+    if not sentence:
+        return idx, None
+
+    try:
+        prompt = build_prompt(
+            sentence=sentence,
+            style=style,
+            panel_index=idx + 1,
+            panel_total=total,
+            visual_thread=visual_thread
+        )
+        print(f"[PROMPT] {prompt}")
+    except Exception as e:
+        print(f"[ERROR] Prompt failed: {e}")
+        prompt = sentence
+        
+    try:
+        image_b64 = client.generate_image(prompt)
+    except Exception as e:
+        print(f"[ERROR] Image failed: {e}")
+        image_b64 = None
+
+    return idx, {
+        "segment": sentence,
+        "prompt": prompt,
+        "image_url": image_b64
+    }
+
+
+def generate_panels(
+    text: str,
+    style: str,
+    hf_api_key: str,
+    visual_thread: dict | None = None
+) -> List[Dict]:
+
     try:
         nltk.data.find("tokenizers/punkt")
     except LookupError:
         nltk.download("punkt")
 
     sentences = nltk.sent_tokenize(text)
+    total = len(sentences)
 
     client = HuggingFaceClient(api_key=hf_api_key)
 
-    panels = []
+    results = [None] * total
 
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if not sentence:
-            continue
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [
+            executor.submit(
+                process_single,
+                idx,
+                sentence,
+                style,
+                total,
+                client,
+                visual_thread
+            )
+            for idx, sentence in enumerate(sentences)
+        ]
 
-        # 🔹 Step 1: Prompt generation
-        try:
-            prompt = build_prompt(sentence, style)
-        except Exception as e:
-            print(f"[ERROR] Prompt generation failed: {e}")
-            prompt = sentence  # fallback
+        for future in as_completed(futures):
+            idx, result = future.result()
+            if result:
+                results[idx] = result
 
-        # 🔹 Step 2: Image generation
-        try:
-            image_b64 = client.generate_image(prompt)
-        except Exception as e:
-            print(f"[ERROR] Image generation failed: {e}")
-            image_b64 = None  # don't crash entire pipeline
-
-        panels.append({
-            "segment": sentence,
-            "prompt": prompt,
-            "image_url": image_b64
-        })
+    panels = [r for r in results if r is not None]
 
     return panels

@@ -1,29 +1,35 @@
 # src/llm/gemini_client.py
+
 import os
 import logging
 from dotenv import load_dotenv
+
 from google import genai
 from google.genai import types
 
-from .prompt_templates import System_prompt, build_user_prompt
+from .prompt_templates import SYSTEM_PROMPT, build_user_prompt
 
+# Load env
 load_dotenv()
 
+# Client setup
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-Model = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
 
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+
 def _call_gemini(prompt: str) -> str:
     try:
         response = client.models.generate_content(
-            model=Model,
+            model=MODEL,
             contents=prompt,
             config=types.GenerateContentConfig(
-                system_instruction=System_prompt
+                system_instruction=SYSTEM_PROMPT
             ),
         )
 
@@ -34,26 +40,24 @@ def _call_gemini(prompt: str) -> str:
         return output
 
     except Exception as e:
-        error_msg = f"Error: {str(e)}"
-        logging.error(error_msg)
-        return error_msg
+        logging.error(f"[GEMINI ERROR] {str(e)}")
+        return ""
 
 
-def generate_image_prompt(sentence: str) -> str:
-   
-    user_prompt = build_user_prompt(sentence)
-
+def generate_image_prompt(
+    sentence: str,
+    panel_index: int,
+    panel_total: int,
+    visual_thread: dict | None = None
+) -> str:
     logging.info(f"[INPUT SENTENCE] {sentence}")
+
+    user_prompt = build_user_prompt(
+        sentence=sentence,
+        panel_index=panel_index,
+        panel_total=panel_total,
+        visual_thread=visual_thread
+    )
 
     return _call_gemini(user_prompt)
 
-
-def generate_prompts_for_segments(segments: list[str]) -> list[str]:
-    outputs = []
-
-    for idx, segment in enumerate(segments):
-        logging.info(f"\n--- Segment {idx+1} ---")
-        result = generate_image_prompt(segment)
-        outputs.append(result)
-
-    return outputs
