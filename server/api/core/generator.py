@@ -1,10 +1,6 @@
 import base64
 import nltk
-
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
+from src.services.promt.gemini_client import generate_image_prompt
 
 
 def fake_image_base64(text: str) -> str:
@@ -17,9 +13,17 @@ def fake_image_base64(text: str) -> str:
 
 def build_prompt(sentence: str, style: str) -> str:
     """
-    Fake 'Gemini-style' prompt engineering
+    Uses Gemini to convert sentence → vivid image prompt,
+    then injects style on top.
     """
-    return f"{style} illustration of: {sentence}. cinematic lighting, ultra detailed"
+
+    # Step 1: Generate base cinematic prompt via Gemini
+    base_prompt = generate_image_prompt(sentence)
+
+    # Step 2: Add style control (your layer)
+    final_prompt = f"{style} style, {base_prompt}"
+
+    return final_prompt
 
 
 def generate_panels(text: str, style: str):
