@@ -9,12 +9,11 @@ class GenerateRequest(BaseModel):
 
 
 # Each panel output
-class Panel(BaseModel):
-    index: int
-    original_sentence: str
-    engineered_prompt: str
-    image_b64: str
 
+class Panel(BaseModel):
+    segment: str
+    prompt: str
+    image_url: str | None
 
 # Response Schema
 class GenerateResponse(BaseModel):
