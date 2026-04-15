@@ -137,8 +137,8 @@ It does three things well:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Parvrajchauhan/pitch-visualizer.git
-cd pitch-visualizer
+git clone https://github.com/Parvrajchauhan/Pitch.git
+cd Pitch
 ```
 
 ### 2. Configure Environment Variables
