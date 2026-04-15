@@ -20,7 +20,7 @@ It does three things well:
 2. **Engineers** a rich, visually descriptive prompt for each scene using an LLM (Gemini)
 3. **Generates** a unique image per panel via a text-to-image API and presents everything as a clean, sequential storyboard UI
 
-This is not a prompt generator. It is a complete **idea → narrative → visuals** pipeline.
+ It is a complete **idea → narrative → visuals** pipeline.
 
 ---
 
