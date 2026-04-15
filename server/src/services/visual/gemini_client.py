@@ -1,3 +1,5 @@
+from .prompt_templates import build_visual_thread_prompt
+
 # src/llm/gemini_client.py
 
 import os
@@ -6,8 +8,6 @@ from dotenv import load_dotenv
 
 from google import genai
 from google.genai import types
-
-from .prompt_templates import SYSTEM_PROMPT, build_user_prompt
 
 # Load env
 load_dotenv()
@@ -22,15 +22,11 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-
 def _call_gemini(prompt: str) -> str:
     try:
         response = client.models.generate_content(
             model=MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT
-            ),
+            contents=prompt
         )
 
         output = response.text.strip() if response.text else ""
@@ -43,21 +39,11 @@ def _call_gemini(prompt: str) -> str:
         logging.error(f"[GEMINI ERROR] {str(e)}")
         return ""
 
+def generate_visual_thread(text: str, style: str) -> str:
+    
 
-def generate_image_prompt(
-    sentence: str,
-    panel_index: int,
-    panel_total: int,
-    visual_thread: str | None = None
-) -> str:
-    logging.info(f"[INPUT SENTENCE] {sentence}")
+    vt_prompt = build_visual_thread_prompt(text, style)
+    visual_thread = _call_gemini(vt_prompt)
 
-    user_prompt = build_user_prompt(
-        sentence=sentence,
-        panel_index=panel_index,
-        panel_total=panel_total,
-        visual_thread=visual_thread
-    )
 
-    return _call_gemini(user_prompt)
-
+    return visual_thread

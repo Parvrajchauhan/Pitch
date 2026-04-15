@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.services.promt.gemini_client import generate_image_prompt
 from src.services.image.huggingface_client import HuggingFaceClient
+from src.services.visual.gemini_client import generate_visual_thread
 
 
 def build_prompt(
@@ -63,7 +64,7 @@ def process_single(
     }
 
 
-def generate_panels(
+def generate_panels1(
     text: str,
     style: str,
     hf_api_key: str,
@@ -102,5 +103,17 @@ def generate_panels(
                 results[idx] = result
 
     panels = [r for r in results if r is not None]
+
+    return panels
+
+def generate_panels(text: str, style: str, hf_api_key: str):
+    visual_thread_data= generate_visual_thread(text, style)
+
+    panels = generate_panels1(
+        text=text,
+        style=style,
+        hf_api_key=hf_api_key,
+        visual_thread=visual_thread_data
+    )
 
     return panels

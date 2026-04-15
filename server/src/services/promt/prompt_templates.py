@@ -48,7 +48,7 @@ def build_user_prompt(
     sentence: str,
     panel_index: int = 1,
     panel_total: int = 3,
-    visual_thread: dict | None = None,
+    visual_thread: str | None = None,
 ) -> str:
     """
     Build the user-turn message sent to Gemini for a single storyboard panel.
@@ -103,14 +103,9 @@ def build_user_prompt(
         )
 
     if visual_thread:
-        thread_lines = [
-            f"  {k}: {v}"
-            for k, v in visual_thread.items()
-            if v and v.strip()
-        ]
         thread_block = (
             "Visual continuity anchors — embed ALL of these in your output:\n"
-            + "\n".join(thread_lines)
+            + "\n" + visual_thread
         )
     else:
         thread_block = (
