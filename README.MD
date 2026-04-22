@@ -24,7 +24,7 @@ It does three things well:
 
 ---
 ## DEMO:
-[![Watch Demo](https://img.youtube.com/vi/VRqb50LI86E/maxresdefault.jpg)](https://youtu.be/VRqb50LI86E)
+https://github.com/user-attachments/assets/62cc66dd-6390-4451-bdd9-1098782d7ab6
 ---
 ## ✨ Features
 - 🧠 **NLP-based sentence segmentation** — splits narrative into meaningful, standalone scenes
