@@ -23,8 +23,8 @@ It does three things well:
  It is a complete **idea → narrative → visuals** pipeline.
 
 ---
-## DEMO:
-<img width="400" height="225" alt="Image" src="https://github.com/user-attachments/assets/a7c1c391-73e6-493f-9fd4-4ddedc7f148c" />
+## 🔗 DEMO
+![Demo](https://github.com/user-attachments/assets/a7c1c391-73e6-493f-9fd4-4ddedc7f148c)
 ---
 ## ✨ Features
 - 🧠 **NLP-based sentence segmentation** — splits narrative into meaningful, standalone scenes
