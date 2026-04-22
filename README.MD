@@ -23,9 +23,12 @@ It does three things well:
  It is a complete **idea → narrative → visuals** pipeline.
 
 ---
+
 ## 🔗 DEMO
-<img width="100%" alt="Demo" src="https://github.com/user-attachments/assets/a7c1c391-73e6-493f-9fd4-4ddedc7f148c"/>
+<video src="https://github.com/user-attachments/assets/c691d650-04a7-488d-ae85-cf340840c54a" controls width="100%"></video>
+
 ---
+
 ## ✨ Features
 - 🧠 **NLP-based sentence segmentation** — splits narrative into meaningful, standalone scenes
 - 🎨 **LLM-powered prompt refinement** — Gemini transforms each sentence into a richly descriptive visual prompt, adding cinematic framing, lighting, and mood
